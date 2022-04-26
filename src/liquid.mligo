@@ -3,4 +3,4 @@ type entrypoints =
   | Redeem of nat
 
 
-
+type event  = Xtz_exchange_rate of nat

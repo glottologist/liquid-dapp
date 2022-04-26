@@ -28,6 +28,13 @@
                dune_3
                nixfmt
               ];
+            shellHook = ''
+              alias lcc="ligo compile contract"
+              alias lce="ligo compile expression"
+              alias lcp="ligo compile parameter"
+              alias lcs="ligo compile storage"
+
+            ''; 
           });
           defaultPackage = pkgs.liquid-dapp;
           defaultApp =
