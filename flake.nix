@@ -33,7 +33,7 @@
               alias lce="ligo compile expression"
               alias lcp="ligo compile parameter"
               alias lcs="ligo compile storage"
-
+              alias build="./do build"
             ''; 
           });
           defaultPackage = pkgs.liquid-dapp;
