@@ -14,7 +14,6 @@ type token_storage = {
   operators : operator_storage;
   token_total_supply : token_total_supply;
   token_metadata : token_metadata_storage;
-
 }
 
 let get_balance_amt (key, ledger : (address * nat) * ledger) : nat =
@@ -23,7 +22,7 @@ let get_balance_amt (key, ledger : (address * nat) * ledger) : nat =
   | None -> 0n
   | Some b -> b
 
-let inc_balance (owner,, amt, ledger
+let inc_balance (owner, amt, ledger
     : address * * nat * ledger) : ledger =
   let bal = get_balance_amt (owner, ledger) in
   let updated_bal = bal + amt in
@@ -31,7 +30,7 @@ let inc_balance (owner,, amt, ledger
   then Big_map.remove owner ledger
   else Big_map.update owner (Some updated_bal) ledger
 
-let dec_balance (owner,, amt, ledger
+let dec_balance (owner, amt, ledger
     : address * nat * ledger) : ledger =
   let bal = get_balance_amt (owner, ledger) in
   match Michelson.is_nat (bal - amt) with
@@ -48,15 +47,11 @@ permissions or constraints are violated.
 @param validate_op function that validates of the tokens from the particular owner can be transferred.
  *)
 let transfer (txs, validate_op, storage
-    : (transfer list) * operator_validator * multi_token_storage)
+    : (transfer list) * operator_validator * token_storage)
     : ledger =
   let make_transfer = fun (l, tx : ledger * transfer) ->
     List.fold
       (fun (ll, dst : ledger * transfer_destination) ->
-        (*checks if the nft is closed, fails if false*)
-        if not Big_map.mem dst.token_id storage.closed_nfts
-        then (failwith "Not able to transfer token" : ledger)
-        else  
         if not Big_map.mem dst.token_id storage.token_metadata
         then (failwith fa2_token_undefined : ledger)
         else
@@ -102,5 +97,3 @@ let fa2_main (param, storage : fa2_entry_points * multi_token_storage)
     let new_ops = fa2_update_operators (updates, storage.operators) in
     let new_storage = { storage with operators = new_ops; } in
     ([] : operation list), new_storage
-
-#endif
