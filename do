@@ -8,7 +8,7 @@ usage(){
     echo "./do <op>"
     echo "=> where:"
     echo "=> op = build.   Build compiles the ligo contract and storage"
-     
+    echo "=> op = dryrun.  Performs a dry-run against the liquid contract that deposits a test amount of XTZ"
 }
 
 if [ -z "$OP" ]
@@ -40,9 +40,20 @@ build(){
     build_storage
 }
 
+
+
+dryrun(){
+ echo "Executing dry-run of contract"
+ INITSTORAGE=$(<src/storage/initial_storage.mligo) 
+ ligo run dry-run src/liquid.mligo "Deposit 5n" "$INITSTORAGE" -s cameligo  -e  liquid_main
+
+}
+
 case $OP in 
   "build")
     build;;
+  "dryrun")
+    dryrun;;
    *)
     fail_op
 esac

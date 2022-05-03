@@ -34,6 +34,7 @@
               alias lcp="ligo compile parameter"
               alias lcs="ligo compile storage"
               alias build="./do build"
+              alias dryrun="./do dryrun"
             ''; 
           });
           defaultPackage = pkgs.liquid-dapp;
