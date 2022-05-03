@@ -42,7 +42,13 @@ type liquid_param =
   | Redeem of nat
 
 (* Event emission *)
-let emit_event ( _e : event ) = unit
+let emit_event ( e : event ) : unit= 
+    (* This is a fake allocation and casting  to try and make the event visable in Michelson*)
+    let (Xtz_exchange_rate rate) = e in
+    let _xtz = Michelson.is_nat (int (rate.xtz)) in
+    let _evxtz = Michelson.is_nat (int (rate.evxtz)) in
+    unit
+
 
 (* Calculate the current exchange rate from the current information in the treasury and the token storage *)
 let compute_current_exchange_rate (s : liquid_storage) : exchange_rate = 
@@ -127,6 +133,7 @@ let remove_from_treasury (a, s: nat * liquid_storage) : liquid_storage =
 let deposit (n, s : nat * liquid_storage) 
     : (operation list) * liquid_storage  =   
     let fx = compute_current_exchange_rate s in
+    let _emit = emit_event (Xtz_exchange_rate fx) in
     let after_token_creation = create_token_if_required s in
     let updated_treasury_storage = transfer_to_treasury (n, after_token_creation) in
     let amount_to_mint : nat = get_amount_to_mint (n, fx) in 
@@ -145,6 +152,7 @@ let deposit (n, s : nat * liquid_storage)
 let redeem (n, s : nat * liquid_storage) 
     : (operation list) * liquid_storage  =   
     let fx = compute_current_exchange_rate s in
+    let _emit = emit_event (Xtz_exchange_rate fx) in
     let amount_to_remove : nat = get_amount_to_remove_from_treasury (n, fx) in
     let updated_treasury_storage = remove_from_treasury (amount_to_remove, s) in
     let token_mint : mint_burn_tx = { owner = Tezos.sender; amount = n } in
