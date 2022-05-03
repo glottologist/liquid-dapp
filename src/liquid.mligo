@@ -1,5 +1,12 @@
 #include "manager.mligo"
 
+
+(* Conversion trick from nat to tez  *)
+let to_tez (v : nat) : tez =  v * 1tez
+
+(* Conversion trick from tez to nat  *)
+let to_nat (x: tez) : nat = x / 1tez
+
 (* Arbitrary token id for the evxta token *)
 let evxtz_token_id = 5n
 
