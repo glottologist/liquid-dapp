@@ -49,7 +49,6 @@ type update_operator =
   | Add_operator of operator_param
   | Remove_operator of operator_param
 
-
 type token_metadata =
 [@layout:comb]
 {
