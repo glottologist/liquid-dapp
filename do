@@ -2,13 +2,15 @@
 set +x 
 
 OP=$1
+ADDR=$2
 
 usage(){
     echo "=============================================================="
     echo "./do <op>"
     echo "=> where:"
-    echo "=> op = build.   Build compiles the ligo contract and storage"
-    echo "=> op = dryrun.  Performs a dry-run against the liquid contract that deposits a test amount of XTZ"
+    echo "=> op = build.              Build compiles the ligo contract and storage"
+    echo "=> op = dryrun.             Performs a dry-run against the liquid contract that deposits a test amount of XTZ"
+    echo "=> op = deploy <address>.   Deploys the smart contract for the passed user address"
 }
 
 if [ -z "$OP" ]
@@ -49,11 +51,21 @@ dryrun(){
 
 }
 
+deploy(){
+
+echo "Deploying contract"
+INITSTORAGE=$(<src/storage/initial_storage.mligo) 
+tezos-client originate contract "liquid" for "$ADDR" transferring 0tez from $ADDR running out/liquid.tz --init "$INITSTORAGE" --burn-cap 2
+
+}
+
 case $OP in 
   "build")
     build;;
   "dryrun")
     dryrun;;
+   "deploy")
+    deploy;;
    *)
     fail_op
 esac

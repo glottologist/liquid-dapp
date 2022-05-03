@@ -35,6 +35,7 @@
               alias lcs="ligo compile storage"
               alias build="./do build"
               alias dryrun="./do dryrun"
+              alias deploy="./do deploy"
             ''; 
           });
           defaultPackage = pkgs.liquid-dapp;

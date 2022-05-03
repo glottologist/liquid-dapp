@@ -30,3 +30,6 @@ _opam/
 
 # Compilation out directory
 out/
+
+# VSCode
+.vscode/
