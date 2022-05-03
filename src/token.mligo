@@ -14,24 +14,23 @@ type token_storage = {
   operators : operator_storage;
   token_total_supply : token_total_supply;
   token_metadata : token_metadata_storage;
-
 }
 
-let get_balance_amt (key, ledger : (address * nat) * ledger) : nat =
+let get_balance_amt (key, ledger : address * ledger) : nat =
   let bal_opt = Big_map.find_opt key ledger in
   match bal_opt with
   | None -> 0n
   | Some b -> b
 
-let inc_balance (owner,, amt, ledger
-    : address * * nat * ledger) : ledger =
+let inc_balance (owner, amt, ledger
+    : address *  nat * ledger) : ledger =
   let bal = get_balance_amt (owner, ledger) in
   let updated_bal = bal + amt in
   if updated_bal = 0n
   then Big_map.remove owner ledger
   else Big_map.update owner (Some updated_bal) ledger
 
-let dec_balance (owner,, amt, ledger
+let dec_balance (owner, amt, ledger
     : address * nat * ledger) : ledger =
   let bal = get_balance_amt (owner, ledger) in
   match Michelson.is_nat (bal - amt) with
@@ -48,21 +47,17 @@ permissions or constraints are violated.
 @param validate_op function that validates of the tokens from the particular owner can be transferred.
  *)
 let transfer (txs, validate_op, storage
-    : (transfer list) * operator_validator * multi_token_storage)
+    : (transfer list) * operator_validator * token_storage)
     : ledger =
   let make_transfer = fun (l, tx : ledger * transfer) ->
     List.fold
       (fun (ll, dst : ledger * transfer_destination) ->
-        (*checks if the nft is closed, fails if false*)
-        if not Big_map.mem dst.token_id storage.closed_nfts
-        then (failwith "Not able to transfer token" : ledger)
-        else  
         if not Big_map.mem dst.token_id storage.token_metadata
-        then (failwith fa2_token_undefined : ledger)
+        then (failwith token_undefined : ledger)
         else
-          let _u = validate_op (tx.from_, Tezos.sender, dst.token_id, storage.operators) in
-          let lll = dec_balance (tx.from_, dst.token_id, dst.amount, ll) in
-          inc_balance(dst.to_, dst.token_id, dst.amount, lll)
+          let _u = validate_op (tx.from_, Tezos.sender,  storage.operators) in
+          let lll = dec_balance (tx.from_, dst.amount, ll) in
+          inc_balance(dst.to_,  dst.amount, lll)
       ) tx.txs l
   in
   List.fold make_transfer txs storage.ledger
@@ -71,10 +66,9 @@ let get_balance (p, ledger, tokens
     : balance_of_param * ledger * token_metadata_storage) : operation =
   let to_balance = fun (r : balance_of_request) ->
     if not Big_map.mem r.token_id tokens
-    then (failwith fa2_token_undefined : balance_of_response)
+    then (failwith token_undefined : balance_of_response)
     else
-      let key = r.owner, r.token_id in
-      let bal = get_balance_amt (key, ledger) in
+      let bal = get_balance_amt (r.owner, ledger) in
       let response : balance_of_response = { request = r; balance = bal; } in
       response
   in
@@ -82,8 +76,8 @@ let get_balance (p, ledger, tokens
   Tezos.transaction responses 0mutez p.callback
 
 
-let fa2_main (param, storage : fa2_entry_points * multi_token_storage)
-    : (operation  list) * multi_token_storage =
+let fa2_main (param, storage : fa2_entry_points * token_storage)
+    : (operation  list) * token_storage =
   match param with
   | Transfer txs ->
     (*
@@ -102,5 +96,3 @@ let fa2_main (param, storage : fa2_entry_points * multi_token_storage)
     let new_ops = fa2_update_operators (updates, storage.operators) in
     let new_storage = { storage with operators = new_ops; } in
     ([] : operation list), new_storage
-
-#endif
