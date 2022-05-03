@@ -47,7 +47,9 @@ let emit_event ( e : event ) : unit=
     let (Xtz_exchange_rate rate) = e in
     let _xtz = Michelson.is_nat (int (rate.xtz)) in
     let _evxtz = Michelson.is_nat (int (rate.evxtz)) in
-    unit
+    match _xtz with
+    | Some _n -> unit
+    | None -> (failwith "This is the emission function" : unit) 
 
 
 (* Calculate the current exchange rate from the current information in the treasury and the token storage *)
